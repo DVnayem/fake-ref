@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends Manager</title>
+    <style>
+        :root {
+            --deep-blue: #0A1931;
+            --accent-blue: #185ADB;
+            --light-blue: #DAE1E7;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .phone-screen {
+            width: 360px;
+            height: 640px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .header {
+            padding: 20px;
+            background: var(--deep-blue);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .copy-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .name-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .name-entry {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .initials {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 15px;
+        }
+
+        .details {
+            flex: 1;
+        }
+
+        .username {
+            color: var(--deep-blue);
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .reward {
+            color: #28a745;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .nav-tabs {
+            height: 60px;
+            background: var(--deep-blue);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .tab-btn {
+            color: var(--light-blue);
+            background: none;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .tab-btn.active {
+            opacity: 1;
+            color: white;
+            position: relative;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 24px;
+            height: 2px;
+            background: var(--accent-blue);
+        }
+
+        .add-user-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(24,90,219,0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-screen">
+        <div class="header">
+            <h1>My Friends</h1>
+            <button class="copy-btn" onclick="copyInviteCode()">Copy Link</button>
+        </div>
+
+        <div class="content-area">
+            <div class="name-list" id="friendsList">
+                <!-- Dynamic content will be added here -->
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn">Home</button>
+            <button class="tab-btn">Tasks</button>
+            <button class="tab-btn active">Invite</button>
+        </div>
+    </div>
+
+    <button class="add-user-btn" onclick="showModal()">+</button>
+
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin: 0 0 24px 0; color: var(--deep-blue)">Add New Friend</h3>
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Enter username" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <input type="number" id="reward" placeholder="Reward amount (RUB)" autocomplete="off">
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="copy-btn" onclick="addUser()" style="width: 100%">Add</button>
+                <button class="tab-btn" onclick="hideModal()" style="background: #f0f2f5; color: var(--deep-blue); width: 100%">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copy function
+        function copyInviteCode() {
+            navigator.clipboard.writeText('FRIEND-1234')
+                .then(() => alert('Invite code copied!'))
+                .catch(err => console.error('Failed to copy:', err));
+        }
+
+        // Original functionality
+        document.addEventListener('DOMContentLoaded', loadFriends);
+
+        function showModal() {
+            document.getElementById('addUserModal').style.display = 'flex';
+        }
+
+        function hideModal() {
+            document.getElementById('addUserModal').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('reward').value = '';
+        }
+
+        function addUser() {
+            const username = document.getElementById('username').value.trim();
+            const reward = document.getElementById('reward').value;
+
+            if (!username || !reward) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const friend = {
+                username,
+                reward: `${reward} RUB`,
+                date: new Date().toLocaleString()
+            };
+
+            addFriendToList(friend);
+            saveToLocalStorage(friend);
+            hideModal();
+        }
+
+        function addFriendToList(friend) {
+            const list = document.getElementById('friendsList');
+            const entry = document.createElement('div');
+            entry.className = 'name-entry';
+            
+            const initial = friend.username.charAt(0).toUpperCase();
+            
+            entry.innerHTML = `
+                <div class="initials">${initial}</div>
+                <div class="details">
+                    <span class="username">${friend.username}</span>
+                    <span class="reward">${friend.reward}</span>
+                </div>
+            `;
+            
+            list.appendChild(entry);
+        }
+
+        function saveToLocalStorage(friend) {
+            const friends = JSON.parse(localStorage.getItem('friends')) || [];
+            friends.push(friend);
+            localStorage.setItem('friends', JSON.stringify(friends));
+        }
+
+        function loadFriends() {
+            const friends = JSON.parse(localStorage.getItem('friends')) || [];
+            const list = document.getElementById('friendsList');
+            
+            friends.forEach(friend => {
+                const entry = document.createElement('div');
+                entry.className = 'name-entry';
+                const initial = friend.username.charAt(0).toUpperCase();
+                
+                entry.innerHTML = `
+                    <div class="initials">${initial}</div>
+                    <div class="details">
+                        <span class="username">${friend.username}</span>
+                        <span class="reward">${friend.reward}</span>
+                    </div>
+                `;
+                
+                list.appendChild(entry);
+            });
+        }
+    </script>
+</body>
+</html>
